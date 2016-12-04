@@ -43,6 +43,11 @@ public class PostersFragment extends Fragment {
     public Realm myRealm;
     public int type;
     public RealmResults<ItemModel> results;
+    private PosterListener mListener;
+
+    void setSelectedMovie(PosterListener posterListener) {
+        this.mListener = posterListener;
+    }
     public PostersFragment() {
 
     }
@@ -74,7 +79,7 @@ public class PostersFragment extends Fragment {
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         myRealm = Realm.getInstance(getContext());
-        myAdapter = new Adapter(getContext(), itemList);
+        myAdapter = new Adapter(getContext(), itemList, mListener);
         mRecyclerView.setAdapter(myAdapter);
         myAdapter.notifyDataSetChanged();
         return view;

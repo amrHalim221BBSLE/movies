@@ -15,13 +15,13 @@ public class DetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //Receive the sent Bundle
-       Intent sentIntent = getIntent();
+        Intent sentIntent = getIntent();
         Bundle sentBundle = sentIntent.getExtras();
         //Inflate Details Fragment & Send the Bundle to it
         DetailActivityFragment mDetailsFragment = new DetailActivityFragment();
         mDetailsFragment.setArguments(sentBundle);
         getSupportFragmentManager().beginTransaction().add(R.id.detailConainer, mDetailsFragment, "").commit();
-
+        //Receive the sent Bundle
     }
 
 }

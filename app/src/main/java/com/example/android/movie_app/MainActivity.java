@@ -2,23 +2,15 @@ package com.example.android.movie_app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import io.realm.Realm;
-
-public class MainActivity extends AppCompatActivity {
-    //boolean mIsTwoPane=false;
+public class MainActivity extends AppCompatActivity implements PosterListener{
+    boolean mIsTwoPane=false;
     Context context;
-    SharedPreferences sharedPreferences;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,27 +18,14 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         context = getBaseContext();
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.item_container, new PostersFragment());
-        fragmentTransaction.commit();
-        if(isTablet()) {
-            Realm realm = Realm.getInstance(getBaseContext());
-            int type;
-            if(sharedPreferences.getString("OrderBy","Most Popular").equals("Most Popular")) {
-                type = 0;
-            } else {
-                type = 1;
-            }
-            ItemModel itemModel = realm.where(ItemModel.class).equalTo("type",type).findFirst();
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            DetailActivityFragment detailFragment=new DetailActivityFragment();
-            Bundle args = new Bundle();
-            detailFragment.setArguments(args);
-            transaction.add(R.id.detailConainer, detailFragment);
-            transaction.commit();
+        PostersFragment mMainFragment = new PostersFragment();
+        //Set The Activity to be a listener to the Fragment
+        mMainFragment.setSelectedMovie(this);
+        getSupportFragmentManager().beginTransaction().add(R.id.item_container, mMainFragment, "").commit();
+        //Check if two pane
+        if (null != findViewById(R.id.detailConainer)) {
+            mIsTwoPane = true;
         }
-
     }
 
 
@@ -74,19 +53,21 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-    public boolean isTablet() {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-    public void transact(String id) {
-        FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
-        DetailActivityFragment detailActivityFragment=new DetailActivityFragment();
-        Bundle bundle=new Bundle();
-        bundle.putString("id",id);
-        detailActivityFragment.setArguments(bundle);
-        fragmentTransaction.replace(R.id.detailConainer, detailActivityFragment);
-        fragmentTransaction.commit();
-
+    @Override
+    public void setSelectedMovie(String id) {
+        // Case One Pane
+        //Start Details Activity
+        if (!mIsTwoPane) {
+            Intent i = new Intent(this, DetailActivity.class);
+            i.putExtra("id", id);
+            startActivity(i);
+        } else {
+            //Case Two-PAne
+            DetailActivityFragment mDetailsFragment= new DetailActivityFragment();
+            Bundle extras= new Bundle();
+            extras.putString("id",id);
+            mDetailsFragment.setArguments(extras);
+            getSupportFragmentManager().beginTransaction().replace(R.id.detailConainer,mDetailsFragment,"").commit();
+        }
     }
 }

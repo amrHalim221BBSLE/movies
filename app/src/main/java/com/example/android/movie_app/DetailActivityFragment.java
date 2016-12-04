@@ -61,8 +61,9 @@ public class DetailActivityFragment extends Fragment {
         //Receive the sent Bundle
         //Receive the sent  String
         Realm intentRealm=Realm.getInstance(getContext());
-        if(getArguments().getString("id") != null) {
-            movieId = getArguments().getString("id");
+        Bundle sentBundle = getArguments();
+        //Receive the sent  String
+        movieId = sentBundle.getString("id");
             ItemModel itemIntent=intentRealm.where(ItemModel.class).equalTo("movieId",movieId).findFirst();
             originalTitle.setText(itemIntent.getOriginalTitle());
             Picasso.with(getContext()).load("http://image.tmdb.org/t/p/" + "w500" +
@@ -133,7 +134,7 @@ public class DetailActivityFragment extends Fragment {
                 }
             });
             //end assign favourite
-        }
+
 
         return view;
     }
